@@ -1,4 +1,7 @@
-import PropTypes from 'prop-types';
+import { useSelector, useDispatch } from 'react-redux';
+import { getContacts } from 'redux/selectors';
+import { addContact } from 'redux/contactsSlice';
+import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import {
@@ -29,10 +32,22 @@ const validationSchema = yup.object().shape({
     .required('Please add number'),
 });
 
-const NewContactForm = ({ addContact }) => {
-  const handleSubmit = (values, { resetForm }) => {
-    const isSuccesfullyAdded = addContact(values);
-    if (isSuccesfullyAdded) resetForm();
+const NewContactForm = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
+
+  const handleSubmit = ({ name, number }, { resetForm }) => {
+    const normalizedName = name.toLowerCase();
+    if (
+      contacts.some(contact => contact.name.toLowerCase() === normalizedName)
+    ) {
+      toast.warn(`${name} is already in contacts.`);
+      return;
+    }
+
+    dispatch(addContact(name, number));
+    toast.success(`${name} is added to contacts.`);
+    resetForm();
   };
 
   return (
@@ -58,10 +73,6 @@ const NewContactForm = ({ addContact }) => {
       </ContactForm>
     </Formik>
   );
-};
-
-NewContactForm.propTypes = {
-  addContact: PropTypes.func.isRequired,
 };
 
 export default NewContactForm;
