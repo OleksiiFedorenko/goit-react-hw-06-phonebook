@@ -6,7 +6,6 @@ import { Label, Input } from './Filter.styled';
 const Filter = () => {
   const dispatch = useDispatch();
   const filter = useSelector(getFilter);
-  console.log(filter);
   const handleFilterChange = e => {
     dispatch(setFilter(e.target.value));
   };
